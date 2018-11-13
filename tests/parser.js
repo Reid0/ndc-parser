@@ -231,6 +231,19 @@ test('should be able to parse "Load States" message (single state)', t =>  {
   t.deepEqual(p.parse('30\x1C000\x1C000\x1C12\x1C000A870500128002002002001127'), parsed);
 });
 
+test('should be able to parse "Load States" message (single state) with Message Authentication Code', t =>  {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '000', 
+    message_sequence_number: '000', 
+    message_subclass: 'Customization Command',
+    message_identifier: 'State Tables load', 
+    states: ['000A870500128002002002001127'],
+    mac_data: '04FE68A0'
+  };
+  t.deepEqual(p.parse('30\x1C000\x1C000\x1C12\x1C000A870500128002002002001127\x1C04FE68A0'), parsed);
+});
+
 test('should be able to parse "Load States" message (multiple states)', t =>  {
   let parsed = { 
     message_class: 'Data Command', 
@@ -263,6 +276,41 @@ test('should be able to parse "Load States" message (multiple states)', t =>  {
     ]
   };
   t.deepEqual(p.parse('3000000012000A870500128002002002001127001K003004004127127127127127002J132000132136132000081178003D024000128000000000000000004D024000000128000000000000024B024002131026026138026003026K031043040031031031031031027I025146001000001001001003031X031002131032033010255000032W034352651127230031570191033Z000000000000000000000000034X034002131035036010255000035W181037255127031034250186036Z000000000000000000000000037X037002131038039010255000038W201196330255031390370031039Z000000000000000000000000040X040002131041042010255000041W048270570127352040040040042Z000000000000000000000000043X043002131044045010255000'), parsed);
+});
+
+test('should be able to parse "Load States" message (multiple states) with Message Authentication Code', t =>  {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '000', 
+    message_sequence_number: '000', 
+    message_subclass: 'Customization Command',
+    message_identifier: 'State Tables load',  
+    states: [ 
+      '000A870500128002002002001127', 
+      '001K003004004127127127127127', 
+      '002J132000132136132000081178', 
+      '003D024000128000000000000000', 
+      '004D024000000128000000000000', 
+      '024B024002131026026138026003', 
+      '026K031043040031031031031031', 
+      '027I025146001000001001001003', 
+      '031X031002131032033010255000', 
+      '032W034352651127230031570191', 
+      '033Z000000000000000000000000', 
+      '034X034002131035036010255000', 
+      '035W181037255127031034250186', 
+      '036Z000000000000000000000000', 
+      '037X037002131038039010255000', 
+      '038W201196330255031390370031', 
+      '039Z000000000000000000000000', 
+      '040X040002131041042010255000', 
+      '041W048270570127352040040040', 
+      '042Z000000000000000000000000', 
+      '043X043002131044045010255000' 
+    ],
+    mac_data: '04FE68A0'
+  };
+  t.deepEqual(p.parse('3000000012000A870500128002002002001127001K003004004127127127127127002J132000132136132000081178003D024000128000000000000000004D024000000128000000000000024B024002131026026138026003026K031043040031031031031031027I025146001000001001001003031X031002131032033010255000032W034352651127230031570191033Z000000000000000000000000034X034002131035036010255000035W181037255127031034250186036Z000000000000000000000000037X037002131038039010255000038W201196330255031390370031039Z000000000000000000000000040X040002131041042010255000041W048270570127352040040040042Z000000000000000000000000043X043002131044045010255000\x1C04FE68A0'), parsed);
 });
 
 /**
@@ -331,10 +379,36 @@ test('should be able to parse "Load FITs" message (multiple entries)', t =>  {
   t.deepEqual(p.parse('3000000015000000064000001255255001000132000015000144000000000000000000000000000000000000000000000000000000000001000065007054255255001000132000015000144000000000000000000000000000000000000000000000000000000000002000065007055255255001000132000015000144000000000000000000000000000000000000000000000000000000000003000065136037255255001000132000015000144000000000000000000000000000000000000000000000000000000000004000065136037255255001000132000015000144000000000000000000000000000000000000000000000000000000000005000065136086255255001000132000015000144000000000000000000000000000000000000000000000000000000000'), parsed);
 });
 
+test('should be able to parse "Dispenser Currency Cassette Mapping Table" ', t =>  {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '000', 
+    message_sequence_number: '000', 
+    message_subclass: 'Customization Command',
+    message_identifier: 'Dispenser Currency Cassette Mapping Table', 
+    cassette_mapping_table: '04FF100500FF200200FF300100FF400000'
+  };
+  t.deepEqual(p.parse('30000001E04FF100500FF200200FF300100FF400000'), parsed);
+});
+
+test('should be able to parse "Enhanced Configuration Data" ', t => {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '000', 
+    message_sequence_number: '000', 
+    message_subclass: 'Customization Command',
+    message_identifier: 'Enhanced Configuration Data', 
+    options_table: '002550125503255',
+    timers_table: '002550125503255'
+  };
+  t.deepEqual(p.parse('30000001A002550125503255002550125503255'), parsed);
+});
+
+
 /**
  * describe('parseDataCommands - Extended Encryption Key Information', t => {
  */
-test('should be able to parse "Extended Encryption Key Information" message', t =>  {
+test('should be able to parse "Extended Encryption Key Information" message, modifier "Decipher new comms key with current master key" ', t =>  {
   let parsed = { 
     message_class: 'Data Command', 
     LUNO: '000', 
@@ -352,6 +426,42 @@ test('should be able to parse "Extended Encryption Key Information" message', t 
    * 30 30 30                                                000
    */
   t.deepEqual(p.parse('30\x1c000\x1c000\x1c42\x1c030000000000000000000000000000000000000000000000000'), parsed);
+});
+
+test('should be able to parse "Extended Encryption Key Information" message, modifier "Decipher new MAC key with current master key" ', t =>  {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '000', 
+    message_sequence_number: '000', 
+    message_subclass: 'Extended Encryption Key Information', 
+    modifier: 'Decipher new MAC key with current master key', 
+    new_key_length: '030',
+    new_key_data: '191099094067071012251170095146066118016078075182',
+  };
+  
+  /**
+  /**
+   * 00 3a 33 1c 1c 1c 34 35 1c 30 33 30 31 39 31 30     .:3...45.0301910
+   * 39 39 30 39 34 30 36 37 30 37 31 30 31 32 32 35     9909406707101225
+   * 31 31 37 30 30 39 35 31 34 36 30 36 36 31 31 38     1170095146066118
+   * 30 31 36 30 37 38 30 37 35 31 38 32                 016078075182
+   * 
+   */
+  t.deepEqual(p.parse('3\x1c000\x1c000\x1c45\x1c030191099094067071012251170095146066118016078075182'), parsed);
+});
+
+test('should be able to parse "Extended Encryption Key Information" message, modifier "Send all KVVs" ', t =>  {
+  let parsed = { 
+    message_class: 'Data Command', 
+    LUNO: '', 
+    message_sequence_number: '', 
+    message_subclass: 'Extended Encryption Key Information', 
+    modifier: 'Send all KVVs', 
+  };
+  /**
+   * 33 1c 1c 1c 34 48                             ..3...4H
+   */
+  t.deepEqual(p.parse('3\x1c\x1c\x1c4H'), parsed);
 });
 
 /**
